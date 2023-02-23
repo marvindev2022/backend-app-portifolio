@@ -52,7 +52,6 @@ async function realizarLogin(req, res) {
     const queryInsert = `SELECT * FROM usuarios WHERE email = $1`;
     const params = [email];
     const { rows, rowCount } = await pool.query(queryInsert, params);
-    if (!rows[0].senha) console.log(senha);
     const senhaValida = await bcrypt.compare(senha, rows[0].senha);
 
     if (rowCount < 1 || !senhaValida)
@@ -78,7 +77,20 @@ async function realizarLogin(req, res) {
   }
 }
 
+async function alterarCadastro(req, res) {
+  const { id } = req.params;
+  const { nome, email, endereco, senha } = req.body;
+  const senhaCryptografada = await bcrypt.hash(senha, 10);
+  const params = [nome, email, endereco, senhaCryptografada, id];
+  const update = await pool.query(
+    `UPDATE usuarios SET nome = $1 ,email = $2 ,endereco = $3, senha = $4 WHERE id = $5 RETURNING *;`,
+    params
+  );
+
+  res.json(update.rows);
+}
 module.exports = {
   cadastrarUsuario,
   realizarLogin,
+  alterarCadastro,
 };

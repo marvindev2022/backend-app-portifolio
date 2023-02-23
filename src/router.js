@@ -2,20 +2,26 @@ const express = require("express");
 const {
   cadastrarUsuario,
   realizarLogin,
+  alterarCadastro,
 } = require("./controllers/usuarios.controller");
+const {addProduto, deletarProduto, alterarPrecoProduto, alterarQuantidadeProduto, listarProdutos} = require('./controllers/produtos.controller')
 const validarToken = require("./middlewares/validarToken");
 const router = express();
 
-router.get("/", (req, res) => {
-  res.json("Bem vindo!");
-});
 
-router.post("/signup", cadastrarUsuario);
-router.post("/signin", realizarLogin);
+router.post("/", realizarLogin);
+router.post("/signup/cadastro", cadastrarUsuario);
 
 router.use(validarToken)
-router.get("/main",(req, res) => {
-  res.json("tudo ok")
-});
+router.get("/produtos",listarProdutos);
+
+router.post("/produtos",addProduto);
+
+router.put("/usuarios/:id/editar",alterarCadastro);
+
+router.patch("/produtos/:id/preco",alterarPrecoProduto);
+router.patch("/produtos/:id/quantidade",alterarQuantidadeProduto);
+
+router.delete("/produtos/:id",deletarProduto);
 
 module.exports = router;
